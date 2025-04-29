@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Prediction</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .upload-form {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .file-input {
+            margin-bottom: 10px;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Prediction</h1>
+    <form class="upload-form" action="http://ec2-44-223-33-50.compute-1.amazonaws.com:5000/predict" method="post"
+        enctype="multipart/form-data">
+        <input type="file" name="file" class="file-input">
+        <input type="submit" value="Upload">
+    </form>
+    <p class="result"></p>
+
+    <script>
+        document.querySelector(".upload-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Extracting file input and creating FormData
+            const fileInput = document.querySelector(".file-input");
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Making a POST request to the prediction endpoint
+            fetch("http://ec2-44-223-33-50.compute-1.amazonaws.com:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Displaying the F1 score result
+                    const resultElement = document.querySelector(".result");
+                    resultElement.innerHTML = "F1 Score: " + data.f1_score;
+                    resultElement.style.display = "block";
+                })
+                .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+
+</html>
